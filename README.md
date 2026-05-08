@@ -28,13 +28,25 @@ Giedraitis](https://github.com/00riddle00)
 
 # Part I — Assignment Specification
 
-Data set link: http://aisdata.ais.dk/aisdk-2026-04-18.zip
+## Objective
 
-**Assignment Description:** The objective of this assignment is to filter out
-noise from a given dataset using NoSQL databases and perform data analysis. The
-dataset contains vessel information, and your task is to apply various filters
-to eliminate noise and calculate the time difference between data points for
-each vessel.
+The objective of this assignment is to filter out noise from a given dataset using NoSQL
+databases and perform data analysis. The dataset contains vessel information, and your
+task is to apply various filters to eliminate noise and calculate the time difference
+between data points for each vessel.
+
+## Dataset
+
+Link:
+[http://aisdata.ais.dk/aisdk-2026-04-18.zip](http://aisdata.ais.dk/aisdk-2026-04-18.zip)
+
+If browser does not permit to open this HTTP link, you will need to use `wget` or `curl`
+to download the dataset. But at first try not clicking on the link, but copying it and
+pasting in the browser address bar, that could work.
+
+---
+
+## Instructions
 
 ### Task 1: Create a NoSQL Database Cluster
 
