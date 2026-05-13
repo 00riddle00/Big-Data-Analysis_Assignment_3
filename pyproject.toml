@@ -1,0 +1,10 @@
+[project]
+name = "venv"
+version = "0.1.0"
+description = "Scalable Maritime AIS Noise Filtering and Temporal Analysis with MongoDB Sharding."
+readme = "README.md"
+requires-python = ">=3.13.13"
+dependencies = [
+    "matplotlib>=3.10.9",
+    "pymongo>=4.17.0",
+]
