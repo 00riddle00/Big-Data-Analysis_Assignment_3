@@ -69,11 +69,13 @@ services:
 
   # Python worker (insertion + filtering + analysis)
   worker:
-    image: python:3.13-slim
+    image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
     container_name: worker
     volumes:
       - ./scripts:/scripts
       - ./data_arch:/data_arch
+      - ./pyproject.toml:/pyproject.toml
+      - ./uv.lock:/uv.lock
     working_dir: /scripts
     command: tail -f /dev/null  # keeps container alive
     depends_on:
