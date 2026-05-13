@@ -1,7 +1,7 @@
 services:
   # Config Server Replica Set (3 nodes)
   configsvr1:
-    image: mongo:8
+    image: mongo:7
     container_name: configsvr1
     command: mongod --configsvr --replSet configrs --port 27017 --bind_ip_all
     volumes:
@@ -10,7 +10,7 @@ services:
       - mongo_net
 
   configsvr2:
-    image: mongo:8
+    image: mongo:7
     container_name: configsvr2
     command: mongod --configsvr --replSet configrs --port 27017 --bind_ip_all
     volumes:
@@ -19,7 +19,7 @@ services:
       - mongo_net
 
   configsvr3:
-    image: mongo:8
+    image: mongo:7
     container_name: configsvr3
     command: mongod --configsvr --replSet configrs --port 27017 --bind_ip_all
     volumes:
@@ -29,7 +29,7 @@ services:
 
   # Shard 1
   shard1:
-    image: mongo:8
+    image: mongo:7
     container_name: shard1
     command: mongod --shardsvr --replSet shard1rs --port 27017 --bind_ip_all
     volumes:
@@ -39,7 +39,7 @@ services:
 
   # Shard 2
   shard2:
-    image: mongo:8
+    image: mongo:7
     container_name: shard2
     command: mongod --shardsvr --replSet shard2rs --port 27017 --bind_ip_all
     volumes:
@@ -49,7 +49,7 @@ services:
 
   # Mongos Router
   mongos:
-    image: mongo:8
+    image: mongo:7
     container_name: mongos
     command: >
       mongos
