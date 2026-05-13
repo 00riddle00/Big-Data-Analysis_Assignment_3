@@ -137,3 +137,46 @@ The AIS CSV files contain 26 columns:
 
 # Part II — Our Implementation
 
+## Development
+
+Prerequisites:
+
+- Docker + Docker Compose
+- [uv](https://docs.astral.sh/uv/) for Python dependency management
+
+Install dependencies:
+
+```bash
+uv sync
+```
+
+Lint and auto-fix:
+
+```bash
+uv run ruff check --fix .
+```
+
+Sort and format imports:
+
+```bash
+uv run ruff check --select I --fix .
+```
+
+Format code:
+
+```bash
+uv run ruff format .
+```
+
+Apply Black string processing normalization:
+
+```bash
+uv run black .
+```
+
+or using full flags:
+
+```bash
+uv run black --line-length=88 --preview --enable-unstable-feature=string_processing .
+```
+
