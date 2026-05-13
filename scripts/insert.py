@@ -143,9 +143,12 @@ def main():
 
     start = time.perf_counter()
 
-    # Distribute chunks across worker processes — pool.map blocks until all done
+    # imap_unordered processes chunks lazily — only one chunk per worker
+    # in memory at a time, preventing OOM on large files
     with Pool(NUM_WORKERS) as pool:
-        results = pool.map(insert_chunk, read_chunks(CSV_PATH, CHUNK_SIZE))
+        results = list(
+            pool.imap_unordered(insert_chunk, read_chunks(CSV_PATH, CHUNK_SIZE))
+        )
 
     total_inserted = sum(results)
     elapsed = time.perf_counter() - start
