@@ -73,6 +73,7 @@ services:
     container_name: worker
     volumes:
       - ./scripts:/scripts
+      - ./outputs:/outputs
       - ./data_arch:/data_arch
       - ./pyproject.toml:/pyproject.toml
       - ./uv.lock:/uv.lock

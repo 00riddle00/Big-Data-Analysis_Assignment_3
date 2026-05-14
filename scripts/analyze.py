@@ -27,7 +27,7 @@ NUM_WORKERS = 8
 TIMESTAMP_FORMAT = "%d/%m/%Y %H:%M:%S"
 
 # Output path for the histogram image (inside container)
-HISTOGRAM_PATH = "/scripts/delta_t_histogram.png"
+HISTOGRAM_PATH = "/outputs/delta_t_histogram.png"
 
 
 def parse_timestamp(ts_str):
@@ -110,26 +110,27 @@ def split_mmsis(mmsis, num_workers):
 def generate_histogram(delta_ts, output_path):
     """Generate and save a histogram of delta t values.
 
-    Uses a log scale on the x-axis to handle the wide range of
-    delta t values (from seconds to hours between pings).
-    Caps the x-axis at 1 hour (3,600,000 ms) to focus on the
-    meaningful range and exclude extreme outliers.
+    Uses log scale on Y axis to handle the extreme spike at short
+    intervals while keeping the long tail visible.
     """
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 6))
 
-    # Cap at 1 hour to exclude extreme outliers from the plot
     capped = [d for d in delta_ts if d <= 3_600_000]
 
     ax.hist(capped, bins=100, color="steelblue", edgecolor="white", linewidth=0.3)
 
+    # Log scale on Y axis — essential given the massive spike at short intervals
+    ax.set_yscale("log")
+
     ax.set_title("Distribution of Delta t Between Consecutive AIS Pings", fontsize=14)
     ax.set_xlabel("Delta t (milliseconds)", fontsize=12)
-    ax.set_ylabel("Frequency", fontsize=12)
+    ax.set_ylabel("Frequency (log scale)", fontsize=12)
 
-    # Format x-axis ticks as human-readable time labels
     ax.set_xticks([0, 10_000, 30_000, 60_000, 300_000, 600_000, 1_800_000, 3_600_000])
     ax.set_xticklabels(
-        ["0", "10s", "30s", "1min", "5min", "10min", "30min", "1h"], fontsize=9
+        ["0", "10s", "30s", "1min", "5min", "10min", "30min", "1h"],
+        fontsize=9,
+        rotation=30,
     )
 
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{int(x):,}"))
