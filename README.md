@@ -15,7 +15,7 @@ Giedraitis](https://github.com/00riddle00)
 <!--toc:start-->
 - [Assignment 3: Scalable Maritime AIS Noise Filtering and Temporal Analysis with MongoDB Sharding](#assignment-3-scalable-maritime-ais-noise-filtering-and-temporal-analysis-with-mongodb-sharding)
   - [Table of Contents:](#table-of-contents)
-  - [Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)](#pinned-demo-mongodb-instance-failure-and-recovery-task-5)
+  - [📌 Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)](#📌-pinned-demo-mongodb-instance-failure-and-recovery-task-5)
 - [Part I — Assignment Specification](#part-i-assignment-specification)
   - [Objective](#objective)
   - [Dataset](#dataset)
@@ -32,9 +32,9 @@ Giedraitis](https://github.com/00riddle00)
   - [Development](#development)
 <!--toc:end-->
 
-## Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)
+## 📌 Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)
 
-[![MongoDB Failure Recovery Demo](https://img.youtube.com/vi/vY6sZFBE_JU/0.jpg)](https://www.youtube.com/watch?v=vY6sZFBE_JU)
+https://github.com/user-attachments/assets/9f798a51-4c97-40fd-979b-1c393a59bb1c
 
 # Part I — Assignment Specification
 
