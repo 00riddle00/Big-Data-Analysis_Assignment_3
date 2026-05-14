@@ -109,8 +109,10 @@ down:
 # -----------------------------------------------------------------------------
 
 init:
+	@echo "==> Waiting for MongoDB instances to be ready"
+	sleep 20
 	@echo "==> Initializing config server replica set"
-	docker exec -it $(MONGOS) mongosh --eval \
+	docker exec -it configsvr1 mongosh --eval \
 		"$$(cat scripts/init_configsvr.js)" || true
 	@echo "==> Initializing shard1 replica set"
 	docker exec -it shard1 mongosh --eval \
@@ -118,6 +120,8 @@ init:
 	@echo "==> Initializing shard2 replica set"
 	docker exec -it shard2 mongosh --eval \
 		"$$(cat scripts/init_shard2.js)" || true
+	@echo "==> Waiting for replica sets to elect primaries"
+	sleep 15
 	@echo "==> Configuring mongos router and enabling sharding"
 	docker exec -it $(MONGOS) mongosh --eval \
 		"$$(cat scripts/init_mongos.js)" || true
@@ -145,8 +149,8 @@ test:
 # -----------------------------------------------------------------------------
 
 clean:
-	@echo "==> Removing generated output files"
-	rm -f outputs/*.png outputs/*.mp4
+	@echo "==> Removing all containers and volumes"
+	docker compose down -v
 	@echo "==> Done."
 
 clean-env:
@@ -154,7 +158,7 @@ clean-env:
 	rm -rf .venv
 	@echo "==> Removed .venv."
 
-distclean: clean clean-env down
-	@echo "==> Removing Docker volumes"
-	docker compose down -v
+distclean: clean clean-env
+	@echo "==> Removing generated output files"
+	find outputs/ -type f ! -name '.gitkeep' -delete
 	@echo "==> distclean complete."
