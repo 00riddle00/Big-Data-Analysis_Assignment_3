@@ -234,6 +234,26 @@ docker exec -it worker uv run --project / python analyze.py
 
 Results are written to `outputs/`.
 
+## Makefile Targets
+
+| Target           | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| `make help`      | Show all available targets                                |
+| `make all`       | Run full pipeline: up + init + insert + filter + analyze  |
+| `make deps`      | Install Python dependencies via uv (incremental)          |
+| `make data`      | Show instructions for downloading the AIS dataset         |
+| `make lint`      | Lint and format Python code (ruff + black)                |
+| `make up`        | Start the MongoDB sharded cluster                         |
+| `make down`      | Stop the MongoDB sharded cluster                          |
+| `make init`      | Initialize replica sets and enable sharding               |
+| `make insert`    | Run parallel CSV insertion (Task 2)                       |
+| `make filter`    | Run parallel noise filtering (Task 3)                     |
+| `make analyze`   | Run delta t calculation and histogram generation (Task 4) |
+| `make test`      | Run unit tests                                            |
+| `make clean`     | Remove generated output files                             |
+| `make clean-env` | Remove Python virtual environment                         |
+| `make distclean` | clean + clean-env + down + remove Docker volumes          |
+
 ## System Specifications
 
 **Hardware:**
