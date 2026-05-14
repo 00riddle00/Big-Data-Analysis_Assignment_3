@@ -1,5 +1,5 @@
 [project]
-name = "venv"
+name = "big_data_analysis_assignment_3"
 version = "0.1.0"
 description = "Scalable Maritime AIS Noise Filtering and Temporal Analysis with MongoDB Sharding."
 readme = "README.md"
