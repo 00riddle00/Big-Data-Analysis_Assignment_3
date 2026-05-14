@@ -206,52 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# ---------------------------------------------------------
-# LaTeX build artifacts
-# ---------------------------------------------------------
-
-*.aux
-*.nav
-*.out
-*.snm
-*.toc
-*.fls
-*.fdb_latexmk
-*.xdv
-*.synctex.gz
-*.bcf
-*.blg
-*.bbl
-*.run.xml
-*.idx
-*.ilg
-*.ind
-*.lof
-*.lot
-*.lol
-
-# ---------------------------------------------------------
-# Pipeline (comment if you want to keep pipeline artifacts)
-# ---------------------------------------------------------
-
-# Pipeline intermediates
-#partitioned/
-#analysis/
-#loitering/
-#benchmark_results/
-#run_metadata*.json
-
-# -----------------------------------------------------------
-# Profiling (comment if you want to keep profiling artifacts)
-# -----------------------------------------------------------
-
-# Memory profiling artifacts
-#mprofile_*.dat
-#*.prof
-
-# Custom directory for profiling artifacts
-#profiling/
-
 # -----------------------------------------------
 # Datasets
 # -----------------------------------------------
