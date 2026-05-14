@@ -15,16 +15,26 @@ Giedraitis](https://github.com/00riddle00)
 <!--toc:start-->
 - [Assignment 3: Scalable Maritime AIS Noise Filtering and Temporal Analysis with MongoDB Sharding](#assignment-3-scalable-maritime-ais-noise-filtering-and-temporal-analysis-with-mongodb-sharding)
   - [Table of Contents:](#table-of-contents)
+  - [Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)](#pinned-demo-mongodb-instance-failure-and-recovery-task-5)
 - [Part I — Assignment Specification](#part-i-assignment-specification)
+  - [Objective](#objective)
+  - [Dataset](#dataset)
+  - [Instructions](#instructions)
     - [Task 1: Create a NoSQL Database Cluster](#task-1-create-a-nosql-database-cluster)
     - [Task 2: Data Insertion in Parallel](#task-2-data-insertion-in-parallel)
     - [Task 3: Data Noise Filtering in Parallel](#task-3-data-noise-filtering-in-parallel)
-    - [Task 4: Calculation of Delta t and Histogram Generation](#task-4-calculation-of-delta-t-and-histogram-generation)
+    - [Task 4: Calculation of `delta t` and Histogram Generation](#task-4-calculation-of-delta-t-and-histogram-generation)
     - [Task 5: Presentation of the Solution](#task-5-presentation-of-the-solution)
-    - [Submission Guidelines:](#submission-guidelines)
+    - [Submission Guidelines](#submission-guidelines)
     - [Note](#note)
+  - [Additional - Dataset Schema](#additional-dataset-schema)
 - [Part II — Our Implementation](#part-ii-our-implementation)
+  - [Development](#development)
 <!--toc:end-->
+
+## Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)
+
+[![MongoDB Failure Recovery Demo](https://img.youtube.com/vi/vY6sZFBE_JU/0.jpg)](https://www.youtube.com/watch?v=vY6sZFBE_JU)
 
 # Part I — Assignment Specification
 
