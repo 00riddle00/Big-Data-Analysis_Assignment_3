@@ -16,7 +16,7 @@ Giedraitis](https://github.com/00riddle00)
 - [Assignment 3: Scalable Maritime AIS Noise Filtering and Temporal Analysis with MongoDB Sharding](#assignment-3-scalable-maritime-ais-noise-filtering-and-temporal-analysis-with-mongodb-sharding)
   - [Table of Contents:](#table-of-contents)
   - [📌 Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)](#📌-pinned-demo-mongodb-instance-failure-and-recovery-task-5)
-- [Part I — Assignment Specification](#part-i-assignment-specification)
+- [Part I – Assignment Specification](#part-i-assignment-specification)
   - [Objective](#objective)
   - [Dataset](#dataset)
   - [Instructions](#instructions)
@@ -27,16 +27,24 @@ Giedraitis](https://github.com/00riddle00)
     - [Task 5: Presentation of the Solution](#task-5-presentation-of-the-solution)
     - [Submission Guidelines](#submission-guidelines)
     - [Note](#note)
-  - [Additional - Dataset Schema](#additional-dataset-schema)
-- [Part II — Our Implementation](#part-ii-our-implementation)
+  - [Additional – Dataset Schema](#additional-dataset-schema)
+- [Part II – Our Implementation](#part-ii-our-implementation)
   - [Development](#development)
+  - [Running](#running)
+  - [System Specifications](#system-specifications)
+  - [Cluster Architecture](#cluster-architecture)
+  - [Results](#results)
+    - [Task 2 – Parallel Insertion](#task-2-parallel-insertion)
+    - [Task 3 – Parallel Noise Filtering](#task-3-parallel-noise-filtering)
+    - [Task 4 – Delta t Analysis](#task-4-delta-t-analysis)
+    - [Task 5 – Failure and Recovery Demo](#task-5-failure-and-recovery-demo)
 <!--toc:end-->
 
 ## 📌 Pinned: Demo: MongoDB Instance Failure and Recovery (Task 5)
 
 https://github.com/user-attachments/assets/9f798a51-4c97-40fd-979b-1c393a59bb1c
 
-# Part I — Assignment Specification
+# Part I – Assignment Specification
 
 ## Objective
 
@@ -110,13 +118,13 @@ encouraged. Good luck with the assignment!
 
 ---
 
-## Additional - Dataset Schema
+## Additional – Dataset Schema
 
 The AIS CSV files contain 26 columns:
 
 | #  | Columns in `*.csv` file        | Format                                                                                                       |
 | -- | ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| 1  | Timestamp                      | Timestamp from the AIS basestation, format: `31/12/2015 23:59:59`                                            |
+| 1  | Timestamp                      | Timestamp from the AIS basestation, format: `31/12/2026 23:59:59`                                            |
 | 2  | Type of mobile                 | Describes what type of target this message is received from (class A AIS Vessel, Class B AIS vessel, etc)    |
 | 3  | MMSI                           | MMSI number of vessel                                                                                        |
 | 4  | Latitude                       | Latitude of message report (e.g. `57,8794`)                                                                  |
@@ -145,7 +153,7 @@ The AIS CSV files contain 26 columns:
 
 ---
 
-# Part II — Our Implementation
+# Part II – Our Implementation
 
 ## Development
 
@@ -189,4 +197,158 @@ or using full flags:
 ```bash
 uv run black --line-length=88 --preview --enable-unstable-feature=string_processing .
 ```
+
+## Running
+
+**1. Start the cluster:**
+
+```bash
+docker compose up -d
+```
+
+**2. Initialize replica sets and sharding (run once):**
+
+```bash
+docker exec -it configsvr1 mongosh --eval "$(cat scripts/init_configsvr.js)"
+docker exec -it shard1 mongosh --eval "$(cat scripts/init_shard1.js)"
+docker exec -it shard2 mongosh --eval "$(cat scripts/init_shard2.js)"
+docker exec -it mongos mongosh --eval "$(cat scripts/init_mongos.js)"
+```
+
+**3. Place the dataset:**
+
+Download `aisdk-2026-04-18.csv` from the dataset link and place it in `data_arch/`.
+
+**4. Run the pipeline:**
+
+```bash
+# Task 2: Insert data
+docker exec -it worker uv run --project / python insert.py
+
+# Task 3: Filter noise
+docker exec -it worker uv run --project / python filter.py
+
+# Task 4: Calculate delta t and generate histogram
+docker exec -it worker uv run --project / python analyze.py
+```
+
+Results are written to `outputs/`.
+
+## System Specifications
+
+**Hardware:**
+
+| Component | Specification                                                |
+| --------- | ------------------------------------------------------------ |
+| Model     | Lenovo IdeaCentre Gaming 5 14ACN6 (AMD)                      |
+| CPU       | AMD Ryzen 7 5700G, 8 Cores/16 Threads, 3.8 GHz (max 4.6 GHz) |
+| RAM       | 32 GB DDR4 3200 MHz (dual-channel)                           |
+| Storage   | Samsung PM981a 1 TB NVMe SSD (PCIe 3.0 x4)                   |
+| GPU       | NVIDIA GeForce RTX 3060 12 GB                                |
+
+**Software:**
+
+| Component | Version                              |
+| --------- | ------------------------------------ |
+| OS        | Arch Linux                           |
+| Kernel    | 7.0.5 (Arch Linux)                   |
+| Docker    | 29.4.3                               |
+| Python    | 3.13.11 (inside worker container)    |
+| MongoDB   | 7.0.32 (inside containers)           |
+
+## Cluster Architecture
+
+The MongoDB sharded cluster consists of 7 Docker containers:
+
+- **3× Config servers** (`configsvr1`, `configsvr2`, `configsvr3`) – form a replica set
+  (`configrs`) that stores cluster metadata and shard topology.
+- **2× Shards** (`shard1`, `shard2`) – each a single-node replica set, storing the
+  actual AIS data.
+- **1× mongos router** – the entry point for all client connections; routes queries to
+  the correct shard based on the shard key.
+- **1× Python worker** – runs insertion, filtering, and analysis scripts.
+
+The `vessels_raw` collection is sharded by **hashed MMSI**, resulting in near-perfect
+data distribution:
+
+| Shard     | Documents  | Share  |
+| --------- | ---------- | ------ |
+| shard1rs  | 10,244,176 | 49.37% |
+| shard2rs  | 10,503,170 | 50.62% |
+
+Sharding was chosen over replication as it provides horizontal scalability and is graded
+higher per the assignment specification.
+
+> **Note on single-node shards:** Each shard uses a single-node replica set for
+> simplicity. In a production setup with multiple nodes per shard, reads could continue
+> from secondary nodes during a primary failure. In our setup, a shard going down causes
+> queries to that shard to fail until it recovers.
+
+## Results
+
+### Task 2 – Parallel Insertion
+
+| Metric             | Value           |
+| ------------------ | --------------- |
+| Documents inserted | 20,747,346      |
+| Workers            | 8               |
+| Chunk size         | 50,000 rows     |
+| Time elapsed       | 226.8s          |
+| Throughput         | 91,466 docs/sec |
+
+8 workers was chosen as a reasonable default for IO-bound insertion. Unlike CPU-bound
+workloads (e.g. Assignment 1's parallel anomaly detection, where 15 workers achieved
+8.39× speedup), insertion throughput is limited by MongoDB write latency rather than CPU
+cores. Further benchmarking with varying worker counts would be a natural extension.
+
+### Task 3 – Parallel Noise Filtering
+
+Filtering criteria applied in order:
+1. Discard records with missing or invalid required fields
+2. Discard vessels with fewer than 100 valid data points
+
+| Metric           | Value      |
+| ---------------- | ---------- |
+| Input vessels    | 5,118      |
+| Vessels kept     | 1,834      |
+| Records kept     | 13,957,451 |
+| Time elapsed     | 111.8s     |
+
+MMSIs are split across workers by index rather than by record count, which results in
+uneven load distribution (e.g. Worker 5 kept 406 vessels vs Worker 0 kept 198). This
+does not affect correctness – all vessels are processed – but a record-count-aware split
+would improve load balance.
+
+### Task 4 – Delta t Analysis
+
+| Metric        | Value                       |
+| ------------- | --------------------------- |
+| Total delta t | 7,552,958                   |
+| Min delta t   | 1,000 ms (1 second)         |
+| Max delta t   | 74,985,000 ms (~20.8 hours) |
+| Mean delta t  | 17,046 ms (~17 seconds)     |
+
+The histogram shows a clear exponential decay pattern – the vast majority of consecutive
+pings occur within 1-2 minutes, consistent with normal Class A AIS reporting intervals
+(2-10 seconds when underway). The long tail extending to ~20 hours represents vessels at
+anchor or with intermittent signal. A log scale on the Y axis is used to keep the tail
+visible alongside the dominant short-interval spike.
+
+![Delta t Histogram](outputs/delta_t_histogram.png)
+
+### Task 5 – Failure and Recovery Demo
+
+The demo video shows shard2 being stopped, the resulting error when querying the
+cluster, followed by shard2 being restarted and full data accessibility being restored.
+
+> **Note:** During the filtering stage (Task 3), shard2 also crashed spontaneously due
+> to memory pressure from heavy parallel load – a real-world failure event, not a
+> scripted one. The system recovered automatically upon restart with all data intact and
+> the 50/50 shard distribution preserved.
+
+YouTube:
+[https://www.youtube.com/watch?v=vY6sZFBE_JU](https://www.youtube.com/watch?v=vY6sZFBE_JU)
+
+Video file:
+[outputs/demo_mongodb_instance_failure_recovery.mp4](outputs/demo_mongodb_instance_failure_recovery.mp4)
 
