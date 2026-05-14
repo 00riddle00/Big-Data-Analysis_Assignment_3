@@ -123,12 +123,12 @@ def generate_histogram(delta_ts, output_path):
     ax.set_yscale("log")
 
     ax.set_title("Distribution of Delta t Between Consecutive AIS Pings", fontsize=14)
-    ax.set_xlabel("Delta t (milliseconds)", fontsize=12)
-    ax.set_ylabel("Frequency (log scale)", fontsize=12)
+    ax.set_xlabel("Delta t (time between consecutive pings)", fontsize=12)
+    ax.set_ylabel("Frequency (number of ping pairs)\n[log scale]", fontsize=12)
 
-    ax.set_xticks([0, 10_000, 30_000, 60_000, 300_000, 600_000, 1_800_000, 3_600_000])
+    ax.set_xticks([60_000, 300_000, 600_000, 1_800_000, 3_600_000])
     ax.set_xticklabels(
-        ["0", "10s", "30s", "1min", "5min", "10min", "30min", "1h"],
+        ["1min", "5min", "10min", "30min", "1h"],
         fontsize=9,
         rotation=30,
     )
