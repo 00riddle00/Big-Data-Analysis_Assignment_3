@@ -31,6 +31,7 @@ Giedraitis](https://github.com/00riddle00)
 - [Part II – Our Implementation](#part-ii-our-implementation)
   - [Development](#development)
   - [Running](#running)
+  - [Makefile Targets](#makefile-targets)
   - [System Specifications](#system-specifications)
   - [Cluster Architecture](#cluster-architecture)
   - [Results](#results)
@@ -203,33 +204,35 @@ uv run black --line-length=88 --preview --enable-unstable-feature=string_process
 **1. Start the cluster:**
 
 ```bash
-docker compose up -d
+make up
 ```
 
 **2. Initialize replica sets and sharding (run once):**
 
 ```bash
-docker exec -it configsvr1 mongosh --eval "$(cat scripts/init_configsvr.js)"
-docker exec -it shard1 mongosh --eval "$(cat scripts/init_shard1.js)"
-docker exec -it shard2 mongosh --eval "$(cat scripts/init_shard2.js)"
-docker exec -it mongos mongosh --eval "$(cat scripts/init_mongos.js)"
+make init
 ```
+
+> **Note:** `make init` includes built-in wait times for MongoDB instances to become
+> ready. If initialization fails, run `make down && make up && make init` to retry.
 
 **3. Place the dataset:**
 
-Download `aisdk-2026-04-18.csv` from the dataset link and place it in `data_arch/`.
+Download `aisdk-2026-04-18.csv` from the dataset link and place it in `data_arch/`. Or
+run `make data` for instructions.
 
 **4. Run the pipeline:**
 
 ```bash
-# Task 2: Insert data
-docker exec -it worker uv run --project / python insert.py
+make insert   # Task 2: insert data
+make filter   # Task 3: filter noise
+make analyze  # Task 4: calculate delta t and generate histogram
+```
 
-# Task 3: Filter noise
-docker exec -it worker uv run --project / python filter.py
+Or run everything at once:
 
-# Task 4: Calculate delta t and generate histogram
-docker exec -it worker uv run --project / python analyze.py
+```bash
+make all
 ```
 
 Results are written to `outputs/`.
@@ -250,9 +253,9 @@ Results are written to `outputs/`.
 | `make filter`    | Run parallel noise filtering (Task 3)                     |
 | `make analyze`   | Run delta t calculation and histogram generation (Task 4) |
 | `make test`      | Run unit tests                                            |
-| `make clean`     | Remove generated output files                             |
+| `make clean`     | Stop cluster and remove Docker volumes                    |
 | `make clean-env` | Remove Python virtual environment                         |
-| `make distclean` | clean + clean-env + down + remove Docker volumes          |
+| `make distclean` | clean + clean-env + remove generated output files         |
 
 ## System Specifications
 
